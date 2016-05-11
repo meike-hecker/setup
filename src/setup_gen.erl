@@ -882,10 +882,8 @@ make_boot(Rel, GenTarget, Roots) ->
 make_install_rel({release, R, Erts, Apps}) ->
     Apps1 =
         lists:map(
-          fun({setup,V,load}) ->
-                  {setup, V};
-             (A) ->
-                  case lists:member(element(1,A), [stdlib,kernel,sasl]) of
+          fun(A) ->
+                  case lists:member(element(1,A), [stdlib,kernel,sasl,setup]) of
                       true ->
                           A;
                       false ->
