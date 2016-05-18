@@ -279,6 +279,7 @@ options(["-target"       , D|T]) -> [{target,D}|options(T)];
 options(["-name"         , N|T]) -> [{name, N}|options(T)];
 options(["-root"         , D|T]) -> [{root, D}|options(T)];
 options(["-out"          , D|T]) -> [{outdir, D}|options(T)];
+options(["-outdir"       , D|T]) -> [{outdir, D}|options(T)];
 options(["-relconf"      , F|T]) -> [{relconf, F}|options(T)];
 options(["-conf"         , F|T]) -> [{conf, F}|options(T)];
 %% options(["-target_subdir", D|T]) -> [{target_subdir, D}|options(T)];
