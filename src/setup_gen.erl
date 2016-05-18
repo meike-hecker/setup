@@ -74,6 +74,7 @@ help() ->
 %%       reltool.config file (see {@link //reltool. `reltool'}) to be used as
 %%       system description. If a `conf' option is present, it will be used;
 %%       otherwise, a `relconf' option must be present.
+%% * `{relspec, File}' - third option, use the .rel file instead
 %%
 %% Additional options:
 %%
@@ -154,6 +155,7 @@ help() ->
 %% * `-name Name'  - Equivalent to `{name, Name}'
 %% * `-root Dir'   - Equivalent to `{root, Dir}'
 %% * `-relconf F'  - Equivalent to `{relconf, F}'
+%% * `-relspec F'     - Equivalent to `{relspec, F}'
 %% * `-conf F'     - Equivalent to `{conf, F}'
 %% * `-install'    - Equivalent to `{install, true}'
 %% * `-sys F'      - Equivalent to `{sys, F}'
@@ -211,6 +213,8 @@ insert_config(Conf, Options) ->
     lists:flatmap(
       fun({conf, _} = C) ->
               [C|Conf];
+	  ({relspec,_} = C) ->
+	       [C|Conf];
          (Other) ->
               [Other]
       end, Options).
@@ -280,6 +284,7 @@ options(["-name"         , N|T]) -> [{name, N}|options(T)];
 options(["-root"         , D|T]) -> [{root, D}|options(T)];
 options(["-out"          , D|T]) -> [{outdir, D}|options(T)];
 options(["-relconf"      , F|T]) -> [{relconf, F}|options(T)];
+options(["-relspec"      , F|T]) -> [{relspec, F}|options(T)];
 options(["-conf"         , F|T]) -> [{conf, F}|options(T)];
 %% options(["-target_subdir", D|T]) -> [{target_subdir, D}|options(T)];
 options(["-install"])            -> [{install, true}];
@@ -358,11 +363,28 @@ ensure_dir(D) ->
 read_config(Opts) ->
     case lists:keyfind(conf, 1, Opts) of
         false ->
-            read_rel_config(Opts);
+		case lists:keyfind(relspec, 1, Opts) of
+		false ->
+	            read_rel_config(Opts);
+		{_, F}->
+		    read_relspec(F, Opts)
+		end;
         {_, F} ->
             Name = option(name, Opts),
             setup:read_config_script(F, Name, Opts)
     end.
+
+read_relspec(F, Opts) ->
+            Name = option(name, Opts),
+	case file:consult(F) of
+	{ok, Conf}->
+		[{release,{RelName, RelVsn},ErlVsn,Apps}] = Conf,
+		[{apps,[App || {App,Vsn} <- Apps]}];
+	
+        Error ->
+                    abort("Error reading relspec ~s:~n"
+                          "~p~n", [F, Error])
+end.
 
 read_rel_config(Opts) ->
     case lists:keyfind(relconf, 1, Opts) of
