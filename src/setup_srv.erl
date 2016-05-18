@@ -31,7 +31,8 @@ start_link() ->
     gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
 
 run_setup() ->
-    gen_server:call(?MODULE, run_setup).
+    Timeout = setup:get_env(setup, timeout, 5000),
+    gen_server:call(?MODULE, run_setup, Timeout).
 
 init(_) ->
     {ok, []}.

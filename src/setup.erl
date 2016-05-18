@@ -130,6 +130,7 @@
 %%    the environment variable `{verify_directories, false}'. This can be desirable
 %%    if setup is used mainly e.g. for environment variable expansion, but not for
 %%    disk storage.
+%% * `{timeout, integer()}' - time to wait for run_setup to finish
 %% @end
 -module(setup).
 
